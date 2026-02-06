@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Digital Clock with Alarm — Safwan</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(120deg, #ff0080, #7928ca, #00c6ff);
+        background-size: 400% 400%;
+        animation: bgMove 12s ease infinite;
+        overflow: hidden;
+    }
+
+    @keyframes bgMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .clock-box {
+        padding: 35px 60px;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.6);
+        text-align: center;
+        color: #fff;
+    }
+
+    .time {
+        font-size: 4.5rem;
+        letter-spacing: 4px;
+    }
+
+    .seconds {
+        font-size: 2.2rem;
+        opacity: 0.8;
+    }
+
+    .ampm {
+        font-size: 1.2rem;
+        color: #00fff0;
+        margin-left: 8px;
+    }
+
+    .date {
+        margin-top: 10px;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        color: #ddd;
+    }
+
+    .alarm {
+        margin-top: 20px;
+    }
+
+    input[type="time"] {
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: none;
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    button {
+        margin-left: 8px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+    @media (max-width: 600px) {
+        .time {
+            font-size: 3rem;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="clock-box">
+    <div class="time">
+        <span id="hours">00</span>:
+        <span id="minutes">00</span>:
+        <span class="seconds" id="seconds">00</span>
+        <span class="ampm" id="ampm">AM</span>
+    </div>
+
+    <div class="date" id="date">MONDAY, 01 JAN 2026</div>
+
+    <div class="alarm">
+        <input type="time" id="alarmTime">
+        <button onclick="setAlarm()">Set Alarm</button>
+        <button onclick="stopAlarm()">Stop</button>
+    </div>
+</div>
+
+<!-- Alarm Sound -->
+<audio id="alarmSound" loop>
+    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3">
+</audio>
+
+<script>
+    let alarmSet = false;
+    let alarmTime = "";
+
+    function updateClock() {
+        const now = new Date();
+
+        let h = now.getHours();
+        let m = now.getMinutes();
+        let s = now.getSeconds();
+        let ampm = h >= 12 ? "PM" : "AM";
+
+        h = h % 12 || 12;
+
+        document.getElementById("hours").textContent = h < 10 ? "0" + h : h;
+        document.getElementById("minutes").textContent = m < 10 ? "0" + m : m;
+        document.getElementById("seconds").textContent = s < 10 ? "0" + s : s;
+        document.getElementById("ampm").textContent = ampm;
+
+        const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+        document.getElementById("date").textContent =
+            `${days[now.getDay()].toUpperCase()}, ${now.getDate()} ${months[now.getMonth()].toUpperCase()} ${now.getFullYear()}`;
+
+        // Alarm check
+        const currentTime = `${now.getHours().toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+        if (alarmSet && currentTime === alarmTime && s === 0) {
+            document.getElementById("alarmSound").play();
+        }
+    }
+
+    function setAlarm() {
+        alarmTime = document.getElementById("alarmTime").value;
+        if (alarmTime) {
+            alarmSet = true;
+            alert("Alarm set for " + alarmTime);
+        }
+    }
+
+    function stopAlarm() {
+        alarmSet = false;
+        document.getElementById("alarmSound").pause();
+        document.getElementById("alarmSound").currentTime = 0;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
+
+</body>
+</html>
